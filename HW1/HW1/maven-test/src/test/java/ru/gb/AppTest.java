@@ -16,8 +16,6 @@ public class AppTest
     public void shouldAnswerWithTrue()
     {
         assertTrue( true );
-        Author receipt = new Author();
-        receipt.getId();
-        receipt.getName();
+
     }
 }
