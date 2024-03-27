@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: HW5
+
+    issue:
+      max_allowed_books:
+        3
+  datasource:
+      url: jdbc:postgresql://localhost:5435/postgres
+      username: postgres
+      password: postgres
+      driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
