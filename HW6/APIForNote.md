@@ -13,5 +13,6 @@
 -	GET /user/{id}/note/{id}/favorites/all - возвращает список избранных заметок пользователя.
 -	POST /user/{id}/note/{id}/favorites/{id} - добавляет заметку с указанным ID в избранные.
 -	PUT /user/{id}/note/{id}/favorites/{id} - убирает заметку с указанным ID из избранных.
+-   GET /user/{id}/note/tag - возвращает заметки с указанным тегом. 
 
 
