@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<table>
+  <caption><b>Книги на руках у читателя</b></caption>
+  <tr>
+    <td>Id</td>
+    <th>Title</th>
+  </tr>
+  <tr th:each="book: ${books}">
+    <td th:text="${book.getId()}"></td>
+    <td th:text="${book.getName()}"></td>
+  </tr>
+</table>
+</body>
+</html>

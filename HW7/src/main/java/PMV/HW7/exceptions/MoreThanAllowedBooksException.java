@@ -1,0 +1,7 @@
+package PMV.HW7.exceptions;
+
+public class MoreThanAllowedBooksException extends IllegalStateException {
+    public MoreThanAllowedBooksException(String message) {
+        super(message);
+    }
+}
