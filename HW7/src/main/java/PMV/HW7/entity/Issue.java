@@ -1,39 +1,55 @@
 package PMV.HW7.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
 @Entity
 @Table(name = "issue")
 @Data
-public class Issue {
+@NoArgsConstructor
+public class Issue{
 
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "book_id")
-    private long bookId;
+    @OneToOne(fetch = FetchType.LAZY)//(mappedBy = "reader")
+    @JoinColumn(name = "reader_id")//, referencedColumnName = "id")
+    @JsonIgnore
+    private Reader reader;
 
-    @Column(name = "reader_id")
-    private long readerId;
+    @OneToOne(fetch = FetchType.LAZY)//(mappedBy = "book")
+    @JoinColumn(name = "book_id")//, referencedColumnName = "id")
+    @JsonIgnore
+    private Book book;
 
     @Column(name = "issued_at")
-    private LocalDateTime issued_at;
+    private LocalDate issuedAt;
 
     @Column(name = "returned_at")
-    private LocalDateTime returned_at;
+    private LocalDate returnedAt;
 
-    public Issue() {
+    public Issue(Reader reader, Book book) {
+        this.reader = reader;
+        this.book = book;
+        this.issuedAt = LocalDate.now();
     }
 
-    public Issue(long bookId, long readerId) {
-        this.bookId = bookId;
-        this.readerId = readerId;
-        this.issued_at = LocalDateTime.now();
+    @Override
+    public String toString() {
+        return "Issue{" +
+                "id=" + id +
+                ", readerId=" + reader.getId() +
+                ", bookId=" + book.getId() +
+                ", issuedAt=" + issuedAt +
+                ", returnedAt=" + returnedAt +
+                '}';
     }
 }

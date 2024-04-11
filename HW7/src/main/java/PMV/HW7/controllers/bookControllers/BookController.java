@@ -1,70 +1,55 @@
 package PMV.HW7.controllers.bookControllers;
 
-
-
-import PMV.HW7.services.BookServices;
 import PMV.HW7.entity.Book;
+import PMV.HW7.services.BookService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
 import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
-@RequestMapping("/book")
 @Slf4j
+@RequestMapping("/books")
 public class BookController {
-    private final BookServices bookService;
+    private final BookService bookService;
 
     @Autowired
-    public BookController(BookServices bookService) {
+    public BookController(BookService bookService) {
         this.bookService = bookService;
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<Book> createBook(@RequestBody String bookName){
-        log.info("Поступил запрос на создание книги: " + bookName);
-
+    @Operation(summary = "save book to repository")
+    @PostMapping
+    public ResponseEntity<Book> save(@RequestBody String title) {
+        log.info("Поступил запрос на создание книги: " + title);
         try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(bookService.createBook(bookName));
-        } catch (RuntimeException e){
+            return ResponseEntity.status(HttpStatus.CREATED).body(bookService.createBook(title));
+        } catch (RuntimeException e) {
             return ResponseEntity.internalServerError().build();
         }
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<List<Book>> getAllBooks(){
-        log.info("Поступил запрос на выдачу информации о всей библиотеке");
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(bookService.getAllBooks());
-        } catch (NoSuchElementException e){
-            return ResponseEntity.notFound().build();
-        }
+    @Operation(summary = "delete by id")
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> delete(@PathVariable long id){
+        bookService.delete(id);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @Operation(summary = "get by id")
     @GetMapping("{id}")
-    public ResponseEntity<?> getBookById(@PathVariable long id){
-        log.info("Поступил запрос на выдачу информации о книге с Id: " + id);
-
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(bookService.getBookById(id));
-        } catch (NoSuchElementException e){
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Book> getById(@PathVariable long id){
+        return ResponseEntity.status(HttpStatus.OK).body(bookService.getById(id));
     }
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteBookById(@PathVariable long id){
-        log.info("Поступил запрос на удаление книги с Id: " + id);
 
-        try {
-            bookService.deleteBook(id);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (NoSuchElementException e){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    @Operation(summary = "get all books")
+    @GetMapping
+    public ResponseEntity<List<Book>> findAll(){
+        return ResponseEntity.status(HttpStatus.OK).body(bookService.findAll());
     }
 }

@@ -1,8 +1,7 @@
 package PMV.HW7.controllers.bookControllers;
 
 import PMV.HW7.entity.Book;
-import PMV.HW7.services.BookServices;
-import lombok.extern.slf4j.Slf4j;
+import PMV.HW7.services.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,19 +11,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
 
 @Controller
-@RequestMapping("/ui")
-@Slf4j
+@RequestMapping("/book")
 public class UiBookController {
+    private BookService bookService;
 
-    private final BookServices bookServices;
     @Autowired
-    public UiBookController(BookServices bookServices){
-        this.bookServices = bookServices;
+    public UiBookController(BookService bookService) {
+        this.bookService = bookService;
     }
-@GetMapping("/books")
-    public String getAllBooks(Model model){
-        List<Book> books = bookServices.getAllBooks();
+
+    @GetMapping()
+    public String findAll(Model model) {
+        List<Book> books = bookService.findAll();
         model.addAttribute("books", books);
-        return "allBooks";
+        return "books";
     }
+
 }

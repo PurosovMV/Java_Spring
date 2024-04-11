@@ -2,11 +2,12 @@ package PMV.HW7.controllers.issueControllers;
 
 
 import PMV.HW7.controllers.IssueRequest;
+import PMV.HW7.entity.Book;
 import PMV.HW7.entity.Issue;
-import PMV.HW7.exceptions.AllreadyHaveBook;
 import PMV.HW7.exceptions.BookHasBeenReturnedException;
-import PMV.HW7.exceptions.MoreThanAllowedBooksException;
-import PMV.HW7.services.IssueServices;
+import PMV.HW7.services.IssueService;
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,61 +15,69 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/issue")
 @Slf4j
+@RequestMapping("/issues")
 public class IssueController {
-    private IssueServices issueService;
+    private final IssueService issueService;
 
     @Autowired
-    public IssueController(IssueServices issueService) {
+    public IssueController(IssueService issueService) {
         this.issueService = issueService;
     }
 
+    @Operation(summary = "return Book to the library")
     @PutMapping("{id}")
     public ResponseEntity<Issue> returnIssue(@PathVariable long id){
         log.info("Поступил запрос на возврат книги в библиотеку");
 
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(issueService.returnIssue(id));
+            return ResponseEntity.status(HttpStatus.OK).body(issueService.returnBook(id));
         } catch (BookHasBeenReturnedException e){
+            log.info(e.toString());
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        } catch (EntityNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<List<Issue>> getAllIssues(){
-        log.info("Поступил запрос на информацию обо всех выдачах");
-
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(issueService.getAllIssues());
-        } catch (NullPointerException e){
-            return ResponseEntity.notFound().build();
-        }
-    }
+    @Operation(summary = "create new issue")
     @PostMapping
-    public ResponseEntity<Issue> issueBook(@RequestBody IssueRequest issueRequest) {
-        log.info("Поступил запрос на выдачу: readerId={}, bookId={}",
-                issueRequest.getReaderId(),
-                issueRequest.getBookId());
+    public ResponseEntity<Issue> create(@RequestBody IssueRequest issueRequest){
         try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(issueService.createIssue(issueRequest));
-        } catch (NoSuchElementException e){
-            return ResponseEntity.notFound().build();
-        } catch (AllreadyHaveBook | MoreThanAllowedBooksException e){
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            return ResponseEntity.status(HttpStatus.CREATED).body(issueService.create(issueRequest));
+        } catch (RuntimeException e){
+            return ResponseEntity.internalServerError().build();
         }
     }
-    @GetMapping("{id}")
-    public ResponseEntity<Issue> getIssueById(@PathVariable long id){
-        log.info("Поступил запрос на информацию о выдаче ");
 
+    @Operation(summary = "get all issues")
+    @GetMapping
+    public ResponseEntity<List<Issue>> findAll(){
+        return ResponseEntity.status(HttpStatus.OK).body(issueService.findAll());
+    }
+
+    @Operation(summary = "get by id")
+    @GetMapping("{id}")
+    public ResponseEntity<Issue> getById(@PathVariable long id){
+        return ResponseEntity.status(HttpStatus.OK).body(issueService.findById(id));
+    }
+
+    @Operation(summary = "delete by id")
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> delete(@PathVariable long id){
+        issueService.delete(id);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping("reader/{id}")
+    public ResponseEntity<Map<String, List<Book>>> getAllBooksFromReaderByReaderId(@PathVariable Long id){
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(issueService.getIssueById(id));
-        } catch (NoSuchElementException e){
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.OK).body(issueService.findBooksByReaderId(id));
+        } catch (RuntimeException e){
+            return ResponseEntity.internalServerError().build();
         }
     }
 }

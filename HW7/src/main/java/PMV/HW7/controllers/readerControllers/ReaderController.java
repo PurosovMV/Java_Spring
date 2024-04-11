@@ -4,7 +4,9 @@ package PMV.HW7.controllers.readerControllers;
 import PMV.HW7.controllers.ReaderRequest;
 import PMV.HW7.entity.Issue;
 import PMV.HW7.entity.Reader;
-import PMV.HW7.services.ReaderServices;
+import PMV.HW7.services.ReaderService;
+
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,76 +17,43 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
-@RequestMapping("/reader")
 @Slf4j
+@RequestMapping("/readers")
 public class ReaderController {
-    private final ReaderServices readerService;
+    private ReaderService readerService;
 
     @Autowired
-    public ReaderController(ReaderServices readerService) {
+    public ReaderController(ReaderService readerService) {
         this.readerService = readerService;
     }
 
-    @GetMapping("{id}/issue")
-    public ResponseEntity<List<Issue>> getIssuesForReader(@PathVariable long id) {
-        log.info("Поступил запрос на информацию о всех выдачах книг пользователю {}",
-                readerService.getReaderById(id));
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(readerService.getIssuesForReader(id));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-
-    @PostMapping("/create")
-    public ResponseEntity<Reader> createReader(@RequestBody ReaderRequest readerRequest) {
-        log.info("Поступил запрос на создание пользователя: " +
-                readerRequest.getFirstName() +
-                " " +
-                readerRequest.getLastName());
-
-        try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(readerService.createReader(
-                    readerRequest.getFirstName(),
-                    readerRequest.getLastName()));
-        } catch (RuntimeException e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @GetMapping("/all")
-    public ResponseEntity<List<Reader>> getAllReaders() {
-        log.info("Поступил запрос на выдачу информации о всех пользователях");
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(readerService.getAllReaders());
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
+    @DeleteMapping("{id}")
+    @Operation(summary = "delete reader by id")
+    public ResponseEntity<Void> delete(@PathVariable long id) {
+        readerService.delete(id);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Reader> getReaderById(@PathVariable long id) {
-        log.info("Поступил запрос на выдачу информации о пользователе с Id: " + readerService.getReaderById(id));
-
-        Reader reader = readerService.getReaderById(id);
-        if (reader == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else {
-            return new ResponseEntity<>(reader, HttpStatus.OK);
-        }
+    @Operation(summary = "get reader by id")
+    public ResponseEntity<Reader> getById(@PathVariable long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(readerService.getById(id));
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteReaderById(@PathVariable long id){
+    @GetMapping
+    @Operation(summary = "get all readers")
+    public ResponseEntity<List<Reader>> findAll() {
+        return ResponseEntity.status(HttpStatus.OK).body(readerService.findAll());
+    }
 
-        log.info("Поступил запрос на удаление пользователя с Id: " + id);
-
+    @Operation(summary = "save reader to repository")
+    @PostMapping
+    public ResponseEntity<Reader> create(@RequestBody ReaderRequest readerRequest) {
         try {
-            readerService.deleteReader(id);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (NoSuchElementException e){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.OK).
+                    body(readerService.create(readerRequest));
+        } catch (RuntimeException e) {
+            return ResponseEntity.internalServerError().build();
         }
     }
 }

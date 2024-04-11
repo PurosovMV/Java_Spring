@@ -2,12 +2,14 @@ package PMV.HW7.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Data
 @Entity
 @Table(name = "reader")
-public class Reader {
+@Data
+@NoArgsConstructor
 
+public class Reader {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,11 +21,12 @@ public class Reader {
     @Column(name = "last_name")
     private String lastName;
 
-    public Reader() {
-    }
-
     public Reader(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
+    }
+    @Override
+    public String toString() {
+        return "Id: " + id + " Reader: " + firstName + " " + lastName;
     }
 }

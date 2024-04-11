@@ -2,24 +2,28 @@ package PMV.HW7.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "book")
 @Data
+@NoArgsConstructor
 public class Book {
+
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     @Column(name = "title")
-    private String name;
+    private String title;
 
-    public Book() {
-
+    public Book(String title) {
+        this.title = title;
     }
 
-    public Book(String name) {
-        this.name = name;
+    @Override
+    public String toString() {
+        return "Id: " + id + " Title: " + title;
     }
-
 }
