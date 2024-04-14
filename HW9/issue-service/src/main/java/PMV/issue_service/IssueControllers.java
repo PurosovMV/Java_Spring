@@ -13,17 +13,20 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 public class IssueControllers {
-    private List<Issue> list;
+    private List<Issue> list = new ArrayList<>();
     private final BookProvider provider;
+    private final ReaderProvider readerProvider;
 
     @PostConstruct
     public void generateIssue() {
-        list = new ArrayList<>();
         for (int i = 0; i < 15; i++) {
             Issue issue = new Issue();
             issue.setId(UUID.randomUUID());
-            issue.setIdReader(UUID.randomUUID());
+            issue.setIdReader(readerProvider.getRandomReaderId());
+            issue.setFirstName(readerProvider.getRandomReaderFirstName());
+            issue.setLastName(readerProvider.getRandomReaderLastName());
             issue.setIdBook(provider.getRandomBookId());
+            issue.setBookName(provider.getRandomBookName());
             list.add(issue);
 
         }

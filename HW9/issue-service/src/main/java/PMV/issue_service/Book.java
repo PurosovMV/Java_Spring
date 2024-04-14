@@ -6,4 +6,5 @@ import java.util.UUID;
 @Data
 public class Book {
    private UUID id;
+   private String name;
 }
