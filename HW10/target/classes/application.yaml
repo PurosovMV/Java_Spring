@@ -1,0 +1,27 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/master
+
+  application:
+    name: HW7
+
+    issue:
+      max_allowed_books:
+        3
+  datasource:
+    url: jdbc:postgresql://localhost:5430/mihailpurosov
+    username: mihailpurosov
+    password: 123
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+
+  jackson:
+    serialization:
+      fail-on-empty-beans: false

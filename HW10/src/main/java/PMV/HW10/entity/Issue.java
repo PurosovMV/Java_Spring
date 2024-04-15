@@ -1,0 +1,54 @@
+package PMV.HW10.entity;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+
+
+@Entity
+@Table(name = "issue")
+@Data
+@NoArgsConstructor
+public class Issue{
+
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    @OneToOne(fetch = FetchType.LAZY)//(mappedBy = "reader")
+    @JoinColumn(name = "reader_id")//, referencedColumnName = "id")
+    @JsonIgnore
+    private Reader reader;
+
+    @OneToOne(fetch = FetchType.LAZY)//(mappedBy = "book")
+    @JoinColumn(name = "book_id")//, referencedColumnName = "id")
+    @JsonIgnore
+    private Book book;
+
+    @Column(name = "issued_at")
+    private LocalDate issuedAt;
+
+    @Column(name = "returned_at")
+    private LocalDate returnedAt;
+
+    public Issue(Reader reader, Book book) {
+        this.reader = reader;
+        this.book = book;
+        this.issuedAt = LocalDate.now();
+    }
+
+    @Override
+    public String toString() {
+        return "Issue{" +
+                "id=" + id +
+                ", readerId=" + reader.getId() +
+                ", bookId=" + book.getId() +
+                ", issuedAt=" + issuedAt +
+                ", returnedAt=" + returnedAt +
+                '}';
+    }
+}
