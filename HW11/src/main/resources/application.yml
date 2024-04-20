@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: HW11
+management:
+  endpoint:
+    env:
+      show-values: ALWAYS
+  endpoints:
+    web:
+      exposure:
+        include: env, prometheus, health, info, metric
+
+
